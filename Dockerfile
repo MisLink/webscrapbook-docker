@@ -1,5 +1,7 @@
 FROM python:3.11-slim
 
+ARG VERSION
+
 WORKDIR /app
 
 EXPOSE 8080
@@ -12,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o /usr/local/bin/envsubst \
     && chmod +x /usr/local/bin/envsubst
 
-RUN pip install webscrapbook --no-cache-dir
+RUN pip install webscrapbook==${VERSION} --no-cache-dir
 
 COPY config.ini .wsb/config.ini
 
