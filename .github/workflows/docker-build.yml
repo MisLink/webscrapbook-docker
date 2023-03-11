@@ -1,0 +1,22 @@
+name: Docker Build
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: danny0838/PyWebScrapBook
+          ref: ${{ github.ref }}
+      - name: Build Docker image
+        uses: docker/build-push-action@v1
+        with:
+          context: .
+          push: true
+          tags: ${{ github.ref }}
