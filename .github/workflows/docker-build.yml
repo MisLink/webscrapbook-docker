@@ -37,8 +37,3 @@ jobs:
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/webscrapbook:latest
             ghcr.io/${{ env.OWNER_LC }}/webscrapbook:${{ env.LATEST_VERSION }}
-      - name: Upload latest version
-        uses: actions/upload-artifact@v3
-        with:
-          name: latest-version
-          path: .latest-version
