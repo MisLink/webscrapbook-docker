@@ -15,7 +15,7 @@ jobs:
         with:
           name: latest-version
           path: .current-version
-          if-no-files-found: ignore
+        continue-on-error: true
       - name: Set current version
         run: |
           CURRENT_VERSION=$(cat .current-version || true)
