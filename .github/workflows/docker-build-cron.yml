@@ -10,17 +10,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Download current version
-        uses: actions/download-artifact@v3
-        with:
-          name: latest-version
-          path: .current-version
-        continue-on-error: true
-      - name: Set current version
-        run: |
-          CURRENT_VERSION=$(cat .current-version || true)
-          echo "Current version: $CURRENT_VERSION"
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
       - name: Fetch latest version
         run: |
           latest_version=$(curl -s "https://pypi.org/pypi/webscrapbook/json" | jq .info.version -r)
@@ -29,22 +18,17 @@ jobs:
           echo $latest_version > .latest-version
       - name: Login
         uses: docker/login-action@v2
-        if: ${{ env.CURRENT_VERSION < env.LATEST_VERSION }}
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: set lower case owner name
-        if: ${{ env.CURRENT_VERSION < env.LATEST_VERSION }}
         run: |
           echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
         env:
           OWNER: "${{ github.repository_owner }}"
       - name: Build Docker image
-        if: ${{ env.CURRENT_VERSION < env.LATEST_VERSION }}
         uses: docker/build-push-action@v4
-        env:
-          LATEST_VERSION: ${{ env.LATEST_VERSION }}
         with:
           context: .
           build-args: VERSION=${{ env.LATEST_VERSION }}
@@ -52,9 +36,3 @@ jobs:
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/webscrapbook:latest
             ghcr.io/${{ env.OWNER_LC }}/webscrapbook:${{ env.LATEST_VERSION }}
-      - name: Upload latest version
-        if: ${{ env.CURRENT_VERSION < env.LATEST_VERSION }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: latest-version
-          path: .latest-version
